@@ -14,8 +14,8 @@ CREATE TABLE questions (
     FOREIGN KEY (address_id) REFERENCES addresses(id)
 );
 
-CREATE INDEX questions_location_point_index on questions USING GIST (location_point);
-CREATE INDEX questions_title_index on questions(title);
-CREATE INDEX questions_created_at_index on questions(created_at);
-CREATE INDEX questions_user_id_index on questions(user_id);
-CREATE INDEX questions_address_id_index on questions(address_id);
+CREATE INDEX questions_location_point_index ON questions USING GIST (location_point);
+CREATE INDEX questions_title_index ON questions(title);
+CREATE INDEX questions_created_at_index ON questions(created_at);
+CREATE INDEX questions_user_id_index ON questions(user_id);
+CREATE INDEX questions_address_id_index ON questions(address_id);
