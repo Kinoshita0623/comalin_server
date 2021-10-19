@@ -7,7 +7,7 @@ use crate::users;
 pub struct User {
     pub id: Uuid,
     pub username: String,
-    pub encrypted_password: Option<String>,
+    pub encrypted_password: String,
     pub avatar_icon: Option<String>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime

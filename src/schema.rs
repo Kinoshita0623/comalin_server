@@ -31,8 +31,8 @@ table! {
         location_point -> Geography,
         address_id -> Nullable<Uuid>,
         user_id -> Uuid,
-        created_at -> Nullable<Timestamp>,
-        updated_at -> Nullable<Timestamp>,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
     }
 }
 
@@ -57,7 +57,7 @@ table! {
         id -> Uuid,
         username -> Varchar,
         avatar_icon -> Nullable<Varchar>,
-        encrypted_password -> Nullable<Varchar>,
+        encrypted_password -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }

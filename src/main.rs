@@ -19,6 +19,7 @@ use crate::post::entities;
 use diesel::pg::PgConnection;
 use crate::post::entities::Post;
 use crate::diesel_util::selectable::Selectable;
+
 fn main() {
     println!("hello");
 
@@ -32,14 +33,22 @@ fn main() {
     for q in questions {
         println!("{}", q.title);
     }*/
-    let users = users::dsl::users.load::<User>(&connection).expect("failed");
+    /*let users = users::dsl::users.load::<User>(&connection).expect("failed");
     for u in users {
         println!("{}", u.username);
-    }
+    }*/
     let result = users::dsl::users.select(PublicUser::columns()).load::<PublicUser>(&connection).expect("failed");
 
     for u in result {
         println!("{}", u.username);
+    }
+
+    let questions = questions::dsl::questions
+        .select((questions::id, questions::title, questions::text, questions::address_id, questions::user_id, questions::created_at, questions::updated_at))
+        .load::<Question>(&connection)
+        .expect("load error");
+    for q in questions {
+        println!("{}", q.title);
     }
     //question::dsl::question::load::<Question>(&connection).expect("取得失敗");
 

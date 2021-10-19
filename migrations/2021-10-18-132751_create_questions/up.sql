@@ -8,8 +8,8 @@ CREATE TABLE questions (
     location_point geography(POINT, 4326) NOT NULL,
     address_id UUID,
     user_id UUID NOT NULL,
-    created_at TIMESTAMP  DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (address_id) REFERENCES addresses(id)
 );
