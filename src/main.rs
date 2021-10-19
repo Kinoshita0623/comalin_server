@@ -19,7 +19,7 @@ use crate::post::entities;
 use diesel::pg::PgConnection;
 use crate::post::entities::Post;
 use crate::diesel_util::selectable::Selectable;
-
+use diesel::sql_types;
 fn main() {
     println!("hello");
 
@@ -44,7 +44,18 @@ fn main() {
     }
 
     let questions = questions::dsl::questions
-        .select((questions::id, questions::title, questions::text, questions::address_id, questions::user_id, questions::created_at, questions::updated_at))
+        .select((
+            questions::id,
+            questions::title,
+            questions::text,
+            questions::longitude,
+            questions::latitude,
+            questions::address_id,
+            questions::user_id,
+            questions::location_point,
+            questions::created_at,
+            questions::updated_at
+            ))
         .load::<Question>(&connection)
         .expect("load error");
     for q in questions {
