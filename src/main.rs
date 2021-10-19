@@ -5,11 +5,13 @@ mod user;
 mod question;
 mod post;
 mod diesel_util;
+
+use bigdecimal::BigDecimal;
 //use diesel::Connection;
 use diesel::prelude::*;
 use diesel::Connection;
-use crate::user::entities::{PublicUser, User};
-use crate::question::entities::Question;
+use crate::user::entities::{NewUser, NewUserAttr, PublicUser, User};
+use crate::question::entities::{NewQuestion, NewQuestionAttr, Question};
 //use crate::question::entities::Question;
 use diesel::dsl::sql;
 use crate::schema::questions;
@@ -20,6 +22,7 @@ use diesel::pg::PgConnection;
 use crate::post::entities::Post;
 use crate::diesel_util::selectable::Selectable;
 use diesel::sql_types;
+use diesel_util::geography::*;
 fn main() {
     println!("hello");
 
@@ -37,10 +40,36 @@ fn main() {
     for u in users {
         println!("{}", u.username);
     }*/
+
+
+    let a = NewUser::new(NewUserAttr {
+        username: &uuid::Uuid::new_v4().to_string(),
+        avatar_icon: None,
+        password: "hogehoge"
+    }).expect("error");
+    let user = diesel::insert_into(users::dsl::users).values(a).get_result::<User>(&connection).expect("error");
+    println!("inserted user {}", user.username);
+    let question = NewQuestion::new(
+        NewQuestionAttr {
+            user_id: &user.id,
+            title: "hogehoge",
+            text: None,
+            latitude: &BigDecimal::from(34.7073686),
+            longitude: &BigDecimal::from(135.4969857)
+        }
+    ).expect("create failed");
+    let question = diesel::insert_into(questions::dsl::questions).values(question)
+        .get_result::<Question>(&connection)
+        .expect("error");
+
+    println!("question id:{}", question.title);
+
+
     let result = users::dsl::users.select(PublicUser::columns()).load::<PublicUser>(&connection).expect("failed");
 
+
     for u in result {
-        println!("{}", u.username);
+        println!("username:{}", u.username);
     }
 
     let questions = questions::dsl::questions
@@ -50,9 +79,9 @@ fn main() {
             questions::text,
             questions::longitude,
             questions::latitude,
+            questions::location_point,
             questions::address_id,
             questions::user_id,
-            questions::location_point,
             questions::created_at,
             questions::updated_at
             ))
