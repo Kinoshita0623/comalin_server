@@ -53,6 +53,18 @@ table! {
     use diesel::sql_types::*;
     use crate::diesel_util::sql_types::*;
 
+    user_tokens (id) {
+        id -> Uuid,
+        hashed_token -> Varchar,
+        user_id -> Uuid,
+        created_at -> Timestamp,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::diesel_util::sql_types::*;
+
     users (id) {
         id -> Uuid,
         username -> Varchar,
@@ -65,11 +77,13 @@ table! {
 
 joinable!(questions -> addresses (address_id));
 joinable!(questions -> users (user_id));
+joinable!(user_tokens -> users (user_id));
 
 allow_tables_to_appear_in_same_query!(
     addresses,
     posts,
     questions,
     spatial_ref_sys,
+    user_tokens,
     users,
 );
