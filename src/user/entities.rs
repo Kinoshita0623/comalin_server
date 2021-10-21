@@ -1,7 +1,8 @@
 use uuid::Uuid;
 use chrono::NaiveDateTime;
 use crate::diesel_util::selectable::Selectable;
-use crate::users;
+use crate::schema::users;
+use crate::schema::user_tokens;
 use bcrypt::{BcryptError, DEFAULT_COST, hash, verify};
 use crypto::sha2::Sha256;
 use crypto::digest::Digest;
