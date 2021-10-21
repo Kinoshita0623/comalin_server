@@ -1,10 +1,13 @@
 #[macro_use]
 extern crate diesel;
+extern crate crypto;
+
 pub mod schema;
 mod user;
 mod question;
 mod post;
 mod diesel_util;
+mod auth;
 
 use bigdecimal::BigDecimal;
 //use diesel::Connection;
