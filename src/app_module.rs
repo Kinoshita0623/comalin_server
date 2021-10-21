@@ -39,7 +39,7 @@ mod test {
         let app = AppModule {
             pool: Box::new(pool)
         };
-        let user_repository = app.user_module().user_repository().as_ref();
+        let user_repository = app.user_module().user_repository();
 
         assert_eq!(type_of(user_repository), "UserRepository")
 

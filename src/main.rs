@@ -3,11 +3,14 @@ extern crate diesel;
 extern crate crypto;
 
 pub mod schema;
+pub mod app_module;
 mod user;
 mod question;
 mod post;
 mod diesel_util;
 mod auth;
+mod db;
+mod errors;
 
 use bigdecimal::BigDecimal;
 //use diesel::Connection;
