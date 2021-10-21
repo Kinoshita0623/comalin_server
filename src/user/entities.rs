@@ -6,6 +6,8 @@ use crate::schema::user_tokens;
 use bcrypt::{BcryptError, DEFAULT_COST, hash, verify};
 use crypto::sha2::Sha256;
 use crypto::digest::Digest;
+use validator::{Validate, ValidationError, ValidateArgs};
+use crate::user::repositories::UserRepository;
 
 #[derive(Queryable)]
 pub struct User {
@@ -32,13 +34,23 @@ impl Selectable for PublicUser {
         return (users::id, users::username, users::avatar_icon, users::created_at, users::updated_at);
     }
 }
-#[derive(Insertable)]
+#[derive(Insertable, Validate)]
 #[table_name="users"]
 pub struct NewUser {
     pub id: Uuid,
+
+    #[validate(custom(function="is_unique_username", arg="&'v_a UserRepository"))]
     pub username: String,
     pub avatar_icon: Option<String>,
     pub encrypted_password: String
+}
+
+pub fn is_unique_username(value: &str, arg: &dyn UserRepository) -> Result<(), ValidationError>{
+    
+    if let Ok(_) = arg.find_by_name(value.to_string()) {
+        return Err(ValidationError::new("duplicate_username"));
+    }
+    return Ok(())
 }
 
 pub struct NewUserAttr<'a> {
