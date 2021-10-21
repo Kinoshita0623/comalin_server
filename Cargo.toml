@@ -10,7 +10,7 @@ actix-web = "3"
 uuid = { version = "0.6.5", features = ["v4"]}
 bcrypt = "0.10"
 
-diesel = { version = "1.4.8", features = ["postgres", "chrono", "uuid", "bigdecimal", "num-bigint", "num-integer", "num-traits", "time", "numeric" ] }
+diesel = { version = "1.4.8", features = ["postgres", "chrono", "uuid", "bigdecimal", "num-bigint", "num-integer", "num-traits", "time", "numeric", "r2d2" ] }
 
 tokio = { version = "0.2.21", features = ["full"] }
 anyhow = "=1.0.36"
