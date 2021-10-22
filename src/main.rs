@@ -49,9 +49,9 @@ fn main() {
 
 
     let a = NewUser::new(NewUserAttr {
-        username: &uuid::Uuid::new_v4().to_string(),
+        username: uuid::Uuid::new_v4().to_string(),
         avatar_icon: None,
-        password: "hogehoge"
+        password: "hogehoge".to_string()
     }).expect("error");
     let user = diesel::insert_into(users::dsl::users).values(a).get_result::<User>(&connection).expect("error");
     println!("inserted user {}", user.username);

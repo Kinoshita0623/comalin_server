@@ -27,10 +27,10 @@ pub fn is_unique_username(value: &str, arg: &dyn UserRepository) -> Result<(), V
     return Ok(())
 }
 
-pub struct NewUserAttr<'a> {
-    pub username: &'a str,
-    pub avatar_icon: Option<&'a str>,
-    pub password: &'a str
+pub struct NewUserAttr {
+    pub username: String,
+    pub avatar_icon: Option<String>,
+    pub password: String
 }
 
 impl NewUser {
