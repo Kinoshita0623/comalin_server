@@ -51,6 +51,13 @@ impl User {
             token: sha256.result_str()
         }
     }
+
+    pub fn check_password(&self, password: &str) -> bool {
+        return match bcrypt::verify(password, &self.encrypted_password.clone()) {
+            Ok(r) =>  r,
+            Err(_) => false
+        };
+    }
 }
 
 
@@ -59,5 +66,18 @@ impl UserToken {
         let mut sha256 = Sha256::new();
         sha256.input_str(token);
         return sha256.result_str() == self.hashed_token;
+    }
+}
+
+
+impl Into<PublicUser> for User {
+    fn into(self) -> PublicUser {
+        return PublicUser {
+            id: self.id,
+            username: self.username,
+            avatar_icon: self.avatar_icon,
+            created_at: self.created_at,
+            updated_at: self.updated_at
+        };
     }
 }
