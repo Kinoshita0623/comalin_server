@@ -22,3 +22,4 @@ rust-crypto = "^0.2"
 
 validator = { version = "0.14", features = ["derive"] }
 log = "0.4"
+futures = "0.3.12"

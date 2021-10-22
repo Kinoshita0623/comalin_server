@@ -12,6 +12,7 @@ mod auth;
 mod db;
 mod errors;
 
+use actix_web::{HttpResponse, HttpServer, Responder, web};
 use bigdecimal::BigDecimal;
 use diesel::prelude::*;
 use diesel::Connection;
@@ -28,74 +29,31 @@ use diesel_util::geography::*;
 use crate::question::entities::{NewQuestion, NewQuestionAttr, Question};
 use crate::user::entities::{PublicUser, User};
 use crate::user::commands::{NewUser, NewUserAttr};
+use actix_web::App;
+use crate::auth::sample_middleware;
+use crate::auth::sample_middleware::SayHi;
 
-fn main() {
-    println!("hello");
-
-    let connection = PgConnection::establish("postgres://dbuser:secret@postgis:5432/database").expect("error");
-
-    //let posts = posts::dsl::posts.load::<Post>(&connection).expect("load error");
-    /*for p in posts {
-        println!("{}", p.title);
-    }*/
-    /*let questions = questions::dsl::questions.load::<Question>(&connection).expect("failed");
-    for q in questions {
-        println!("{}", q.title);
-    }*/
-    /*let users = users::dsl::users.load::<User>(&connection).expect("failed");
-    for u in users {
-        println!("{}", u.username);
-    }*/
-
-
-    let a = NewUser::new(NewUserAttr {
-        username: uuid::Uuid::new_v4().to_string(),
-        avatar_icon: None,
-        password: "hogehoge".to_string()
-    }).expect("error");
-    let user = diesel::insert_into(users::dsl::users).values(a).get_result::<User>(&connection).expect("error");
-    println!("inserted user {}", user.username);
-    let question = NewQuestion::new(
-        NewQuestionAttr {
-            user_id: &user.id,
-            title: "hogehoge",
-            text: None,
-            latitude: &BigDecimal::from(34.7073686),
-            longitude: &BigDecimal::from(135.4969857)
-        }
-    ).expect("create failed");
-    let question = diesel::insert_into(questions::dsl::questions).values(question)
-        .get_result::<Question>(&connection)
-        .expect("error");
-
-    println!("question id:{}", question.title);
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| {
+        App::new()
+            .route("/hey", web::get().to(manual_hello))
+            .service(
+                web::scope("/private")
+                    .wrap(SayHi{})
+                    .route("/hoge", web::get().to(private_hello))
+            )
+    })
+    .bind("0.0.0.0:80")?
+    .run()
+    .await
+}
 
 
-    let result = users::dsl::users.select(PublicUser::columns()).load::<PublicUser>(&connection).expect("failed");
+async fn manual_hello() -> impl Responder {
+    HttpResponse::Ok().body("Hey there!")
+}
 
-
-    for u in result {
-        println!("username:{}", u.username);
-    }
-
-    let questions = questions::dsl::questions
-        .select((
-            questions::id,
-            questions::title,
-            questions::text,
-            questions::longitude,
-            questions::latitude,
-            questions::location_point,
-            questions::address_id,
-            questions::user_id,
-            questions::created_at,
-            questions::updated_at
-            ))
-        .load::<Question>(&connection)
-        .expect("load error");
-    for q in questions {
-        println!("{}", q.title);
-    }
-    //question::dsl::question::load::<Question>(&connection).expect("取得失敗");
-
+async fn private_hello() -> impl Responder {
+    return HttpResponse::Ok().body("Private There!!");
 }

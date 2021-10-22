@@ -16,7 +16,7 @@ impl Clone for AppModule{
 }
 
 impl AppModule {
-    fn user_module(&self) -> Box<dyn UserModule>{
+    pub fn user_module(&self) -> Box<dyn UserModule>{
         let pool = self.pool.clone();
         return Box::new(
             UserModuleImpl::new(pool)
