@@ -1,6 +1,7 @@
 use uuid::Uuid;
 use crate::errors::service_error::ServiceError;
-use crate::user::entities::{NewUser, User};
+use crate::user::commands::NewUser;
+use crate::user::entities::User;
 
 
 pub trait UserRepository {

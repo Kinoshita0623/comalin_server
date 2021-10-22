@@ -1,6 +1,5 @@
 use diesel::{PgConnection, RunQueryDsl};
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
-use crate::user::entities::{NewUser, User};
 use crate::user::repositories::UserRepository;
 use crate::schema::users;
 use uuid::Uuid;
@@ -9,6 +8,8 @@ use diesel::result::Error as DieselError;
 use crate::errors::service_error::ServiceError;
 use log::{error};
 use validator::{Validate, ValidationError, ValidateArgs};
+use crate::user::commands::NewUser;
+use crate::user::entities::User;
 
 pub struct PgUserDAO {
     pool: Box<Pool<ConnectionManager<PgConnection>>>

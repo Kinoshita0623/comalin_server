@@ -13,12 +13,8 @@ mod db;
 mod errors;
 
 use bigdecimal::BigDecimal;
-//use diesel::Connection;
 use diesel::prelude::*;
 use diesel::Connection;
-use crate::user::entities::{NewUser, NewUserAttr, PublicUser, User};
-use crate::question::entities::{NewQuestion, NewQuestionAttr, Question};
-//use crate::question::entities::Question;
 use diesel::dsl::sql;
 use crate::schema::questions;
 use crate::schema::users;
@@ -29,6 +25,10 @@ use crate::post::entities::Post;
 use crate::diesel_util::selectable::Selectable;
 use diesel::sql_types;
 use diesel_util::geography::*;
+use crate::question::entities::{NewQuestion, NewQuestionAttr, Question};
+use crate::user::entities::{PublicUser, User};
+use crate::user::commands::{NewUser, NewUserAttr};
+
 fn main() {
     println!("hello");
 
