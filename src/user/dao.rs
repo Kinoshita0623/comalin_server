@@ -1,3 +1,5 @@
+use crypto::digest::Digest;
+use crypto::sha2::Sha256;
 use diesel::{PgConnection, RunQueryDsl};
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use crate::user::repositories::UserRepository;
@@ -8,8 +10,9 @@ use diesel::result::Error as DieselError;
 use crate::errors::service_error::ServiceError;
 use log::{error};
 use validator::{Validate, ValidationError, ValidateArgs};
-use crate::user::commands::NewUser;
-use crate::user::entities::User;
+use crate::schema::user_tokens;
+use crate::user::commands::{NewUser, NewUserToken};
+use crate::user::entities::{User, UserToken};
 
 pub struct PgUserDAO {
     pool: Box<Pool<ConnectionManager<PgConnection>>>
@@ -74,6 +77,40 @@ impl UserRepository for PgUserDAO {
         return Ok(count == 1);
     }
 
+    fn find_by_token(&self, token: &str) -> Result<User, ServiceError> {
+        let c = self.get_connection()?;
+        let mut sha256 = Sha256::new();
+        sha256.input_str(token);
+        let res = user_tokens::dsl::user_tokens
+            .filter(user_tokens::hashed_token.eq(sha256.result_str()))
+            .first::<UserToken>(&c);
+        let token: UserToken = match res {
+            Ok(token) => token,
+            Err(e) => {
+                return Err(e.into());
+            }
+        };
+        return self.find(token.user_id);
+    }
+
+    fn save_token(&self, token: NewUserToken) -> Result<(), ServiceError> {
+        let c = self.get_connection()?;
+        return match diesel::insert_into(user_tokens::dsl::user_tokens).values(token).execute(&c) {
+            Ok(_) => Ok(()),
+            Err(e) => Err(e.into())
+        };
+    }
+
+    fn delete_token(&self, token: &str) -> Result<(), ServiceError> {
+        let mut sha256 = Sha256::new();
+        sha256.input_str(token);
+        let c = self.get_connection()?;
+        let filter = user_tokens::dsl::user_tokens.filter(user_tokens::hashed_token.eq(sha256.result_str()));
+        return match diesel::delete(filter).execute(&c) {
+            Ok(_) => Ok(()),
+            Err(e) => Err(e.into())
+        }
+    }
 
 }
 
