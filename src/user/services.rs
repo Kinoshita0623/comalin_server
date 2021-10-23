@@ -5,20 +5,23 @@ use validator::ValidationErrors;
 use validator::ValidationError;
 use crate::user::commands::{NewUser, NewUserAttr};
 use validator::Validate;
+use serde::Deserialize;
+use serde::Serialize;
 
-
+#[derive(Deserialize)]
 pub struct LoginRequest {
     pub username: String,
     pub password: String
 }
 
-#[derive(Validate)]
+#[derive(Validate, Deserialize)]
 pub struct RegisterRequest {
     #[validate(length(min = 3, max = 20))]
     pub username: String,
     pub password: String
 }
 
+#[derive(Serialize)]
 pub struct AuthResponse {
     pub token: String,
     pub user: PublicUser

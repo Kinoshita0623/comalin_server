@@ -5,6 +5,7 @@ use crate::schema::users;
 use crypto::digest::Digest;
 use crypto::sha2::Sha256;
 use crate::user::commands::RawToken;
+use serde::Serialize;
 
 #[derive(Queryable)]
 pub struct User {
@@ -16,7 +17,7 @@ pub struct User {
     pub updated_at: NaiveDateTime
 }
 
-#[derive(Queryable)]
+#[derive(Queryable, Serialize)]
 pub struct PublicUser {
     pub id: Uuid,
     pub username: String,

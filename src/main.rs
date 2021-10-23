@@ -21,7 +21,6 @@ use crate::schema::questions;
 use crate::schema::users;
 use crate::schema::posts;
 use crate::post::entities;
-use diesel::pg::PgConnection;
 use crate::post::entities::Post;
 use crate::diesel_util::selectable::Selectable;
 use diesel::sql_types;
@@ -42,12 +41,18 @@ async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
     let database_url = env::var("DATABASE_URL")
         .expect("DATABASE_URLが存在しません");
+
+    let host = env::var("HOST").expect("HOSTが存在しません");
+    let connection_count = env::var("CONNECTION_COUNT").expect("CONNECTION_POOL数を読み込めませんでした");
+
+
     println!("DATABASE_URL:{}", database_url);
     let config = DbConfig {
-        url: database_url,
-        connection_count: 2
+        url: database_url.clone(),
+        connection_count: connection_count.parse::<u32>().expect("コネクション数は整数型です")
     };
     let pool = config.create_pool();
+    println!("DATABASE_URL:{}", database_url.clone());
     HttpServer::new(move || {
         App::new()
             .data(
@@ -55,6 +60,8 @@ async fn main() -> std::io::Result<()> {
                     pool: Box::new(pool.clone())
                 }
             )
+            .route("/login", web::post().to(auth::auth_controller::login))
+            .route("/register", web::post().to(auth::auth_controller::register))
             .route("/hey", web::get().to(manual_hello))
             .service(
                 web::scope("/private")
@@ -63,7 +70,7 @@ async fn main() -> std::io::Result<()> {
                     .route("/hoge", web::get().to(private_hello))
             )
     })
-    .bind("0.0.0.0:8081")?
+    .bind(host)?
     .run()
     .await
 }

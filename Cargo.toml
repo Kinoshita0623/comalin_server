@@ -7,14 +7,14 @@ edition = "2018"
 
 [dependencies]
 actix-web = "3"
-uuid = { version = "0.6.5", features = ["v4"]}
+uuid = { version = "0.6.5", features = ["v4", "serde"]}
 bcrypt = "0.10"
 
 diesel = { version = "1.4.8", features = ["postgres", "chrono", "uuid", "bigdecimal", "num-bigint", "num-integer", "num-traits", "time", "numeric", "r2d2" ] }
 
 tokio = { version = "0.2.21", features = ["full"] }
 anyhow = "=1.0.36"
-chrono = "=0.4.19"
+chrono = { version = "0.4.19", features = ["serde"] }
 bigdecimal = "0.1.2"
 postgis = "0.9.0"
 rust-crypto = "^0.2"
@@ -24,3 +24,4 @@ validator = { version = "0.14", features = ["derive"] }
 log = "0.4"
 futures = "0.3.12"
 dotenv = "0.15.0"
+serde = { version = "1.0", features = ["derive"] }
