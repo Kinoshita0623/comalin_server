@@ -42,9 +42,10 @@ async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
     let database_url = env::var("DATABASE_URL")
         .expect("DATABASE_URLが存在しません");
+    println!("DATABASE_URL:{}", database_url);
     let config = DbConfig {
         url: database_url,
-        connection_count: 5
+        connection_count: 2
     };
     let pool = config.create_pool();
     HttpServer::new(move || {
@@ -62,7 +63,7 @@ async fn main() -> std::io::Result<()> {
                     .route("/hoge", web::get().to(private_hello))
             )
     })
-    .bind("0.0.0.0:80")?
+    .bind("0.0.0.0:8081")?
     .run()
     .await
 }

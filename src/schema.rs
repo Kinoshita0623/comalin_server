@@ -1,5 +1,6 @@
 table! {
     use diesel::sql_types::*;
+    use crate::diesel_util::sql_types::*;
 
     addresses (id) {
         id -> Uuid,
@@ -8,6 +9,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
+    use crate::diesel_util::sql_types::*;
 
     posts (id) {
         id -> Int8,
@@ -36,6 +38,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
+    use crate::diesel_util::sql_types::*;
 
     spatial_ref_sys (srid) {
         srid -> Int4,
@@ -48,6 +51,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
+    use crate::diesel_util::sql_types::*;
 
     user_tokens (id) {
         id -> Uuid,
@@ -59,6 +63,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
+    use crate::diesel_util::sql_types::*;
 
     users (id) {
         id -> Uuid,
