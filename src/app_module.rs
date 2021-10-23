@@ -4,7 +4,7 @@ use diesel::r2d2::ConnectionManager;
 use crate::user::module::{UserModule, UserModuleImpl};
 
 pub struct AppModule {
-    pool: Box<Pool<ConnectionManager<PgConnection>>>
+    pub pool: Box<Pool<ConnectionManager<PgConnection>>>
 }
 
 impl Clone for AppModule{

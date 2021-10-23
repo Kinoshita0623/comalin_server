@@ -32,15 +32,33 @@ use crate::user::commands::{NewUser, NewUserAttr};
 use actix_web::App;
 use crate::auth::sample_middleware;
 use crate::auth::sample_middleware::SayHi;
+use crate::auth::auth_middleware::TokenAuth;
+use crate::app_module::AppModule;
+use std::env;
+use crate::db::DbConfig;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
+    dotenv::dotenv().ok();
+    let database_url = env::var("DATABASE_URL")
+        .expect("DATABASE_URLが存在しません");
+    let config = DbConfig {
+        url: database_url,
+        connection_count: 5
+    };
+    let pool = config.create_pool();
+    HttpServer::new(move || {
         App::new()
+            .data(
+                AppModule {
+                    pool: Box::new(pool.clone())
+                }
+            )
             .route("/hey", web::get().to(manual_hello))
             .service(
                 web::scope("/private")
                     .wrap(SayHi{})
+                    .wrap(TokenAuth{})
                     .route("/hoge", web::get().to(private_hello))
             )
     })
