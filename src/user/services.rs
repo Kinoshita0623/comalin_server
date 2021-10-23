@@ -8,17 +8,20 @@ use validator::Validate;
 use serde::Deserialize;
 use serde::Serialize;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Validate)]
 pub struct LoginRequest {
-    pub username: String,
-    pub password: String
+    #[validate(required)]
+    pub username: Option<String>,
+    #[validate(required, length(min = 6, max = 40))]
+    pub password: Option<String>
 }
 
 #[derive(Validate, Deserialize)]
 pub struct RegisterRequest {
-    #[validate(length(min = 3, max = 20))]
-    pub username: String,
-    pub password: String
+    #[validate(required)]
+    pub username: Option<String>,
+    #[validate(required)]
+    pub password: Option<String>
 }
 
 #[derive(Serialize)]
@@ -39,8 +42,11 @@ pub struct PgUserService {
 }
 impl UserService for PgUserService {
     fn login(&self, req: &LoginRequest) -> Result<AuthResponse, ServiceError> {
+        /*if let Err(e) = req.validate() {
+            return Err(ServiceError::ValidationError { body: e })
+        }*/
         let ur = self.user_module.user_repository();
-        let res = ur.find_by_name(req.username.clone());
+        let res = ur.find_by_name(req.username.clone().unwrap());
         if let Err(e) = res {
             return match e {
                 ServiceError::NotFoundError => {
@@ -77,7 +83,7 @@ impl UserService for PgUserService {
             }
         };
 
-        if !u.check_password(&req.password) {
+        if !u.check_password(&req.password.clone().unwrap()) {
             let mut ve = ValidationErrors::new();
             ve.add("password", ValidationError::new("unknown user"));
             return Err(
@@ -106,11 +112,14 @@ impl UserService for PgUserService {
     }
 
     fn register(&self, req: &RegisterRequest) -> Result<AuthResponse, ServiceError> {
+        if let Err(e) = req.validate() {
+            return Err(ServiceError::ValidationError { body: e })
+        }
         let ur = self.user_module.user_repository();
 
         let new_user = NewUser::new(NewUserAttr {
-            username: req.username.clone(),
-            password: req.password.clone(),
+            username: req.username.clone().unwrap(),
+            password: req.password.clone().unwrap(),
             avatar_icon: None
         });
         let new_user = match new_user {
