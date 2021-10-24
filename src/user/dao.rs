@@ -8,7 +8,7 @@ use uuid::Uuid;
 use diesel::prelude::*;
 use diesel::result::Error as DieselError;
 use crate::errors::service_error::ServiceError;
-use log::{error};
+use log::{error, debug};
 use validator::{Validate, ValidationError, ValidateArgs};
 use crate::schema::user_tokens;
 use crate::user::commands::{NewUser, NewUserToken};
@@ -32,6 +32,7 @@ impl UserRepository for PgUserDAO {
 
         let e = match diesel::insert_into(users::dsl::users).values(user).get_result::<User>(&c) {
             Ok(user) => {
+                debug!("Success create user userId:{}, username:{}", user.id.to_string(), user.username);
                 return Ok(user);
             },
             Err(e) => e

@@ -2,6 +2,9 @@
 extern crate diesel;
 extern crate crypto;
 
+#[macro_use]
+extern crate log;
+
 pub mod schema;
 pub mod app_module;
 mod user;
@@ -39,6 +42,7 @@ use crate::db::DbConfig;
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
+    env_logger::init();
     let database_url = env::var("DATABASE_URL")
         .expect("DATABASE_URLが存在しません");
 

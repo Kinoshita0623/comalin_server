@@ -22,6 +22,7 @@ rust-crypto = "^0.2"
 
 validator = { version = "0.14", features = ["derive"] }
 log = "0.4"
+env_logger = "0.8.4"
 futures = "0.3.12"
 dotenv = "0.15.0"
 serde = { version = "1.0", features = ["derive"] }
