@@ -14,6 +14,7 @@ mod diesel_util;
 mod auth;
 mod db;
 mod errors;
+mod router;
 
 use actix_web::{HttpResponse, HttpServer, Responder, web};
 use bigdecimal::BigDecimal;
@@ -38,11 +39,15 @@ use crate::auth::auth_middleware::TokenAuth;
 use crate::app_module::AppModule;
 use std::env;
 use crate::db::DbConfig;
+use env_logger::{Builder, Target};
+
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
-    env_logger::init();
+    let mut builder = Builder::from_default_env();
+    builder.target(Target::Stdout);
+    builder.init();
     let database_url = env::var("DATABASE_URL")
         .expect("DATABASE_URLが存在しません");
 
@@ -64,15 +69,7 @@ async fn main() -> std::io::Result<()> {
                     pool: Box::new(pool.clone())
                 }
             )
-            .route("/login", web::post().to(auth::auth_controller::login))
-            .route("/register", web::post().to(auth::auth_controller::register))
-            .route("/hey", web::get().to(manual_hello))
-            .service(
-                web::scope("/private")
-                    .wrap(SayHi{})
-                    .wrap(TokenAuth{})
-                    .route("/hoge", web::get().to(private_hello))
-            )
+            .configure(router::route)
     })
     .bind(host)?
     .run()
