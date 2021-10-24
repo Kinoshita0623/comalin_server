@@ -35,6 +35,7 @@ pub struct NewUserAttr {
 
 impl NewUser {
     pub fn new(new_user: NewUserAttr) -> Result<NewUser, BcryptError> {
+        //NOTE: bcryptはそこそこ遅いので頻繁に呼び出さないこと
         let user = NewUser {
             id: Uuid::new_v4(),
             username: new_user.username.to_string(),
