@@ -6,8 +6,9 @@ use crypto::digest::Digest;
 use crypto::sha2::Sha256;
 use crate::user::commands::RawToken;
 use serde::Serialize;
+use bcrypt::{BcryptError, DEFAULT_COST};
 
-#[derive(Queryable)]
+#[derive(Queryable, Identifiable)]
 pub struct User {
     pub id: Uuid,
     pub username: String,
@@ -58,6 +59,16 @@ impl User {
             Ok(r) =>  r,
             Err(_) => false
         };
+    }
+
+    pub fn change_password(&mut self, password: &str) -> Result<(), BcryptError>{
+        self.encrypted_password = bcrypt::hash(password, DEFAULT_COST)?;
+        
+        return Ok(());
+    }
+
+    pub fn set_avatar_icon(&mut self, avatar_icon: Option<String>) {
+        self.avatar_icon = avatar_icon;
     }
 }
 
