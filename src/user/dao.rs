@@ -113,6 +113,23 @@ impl UserRepository for PgUserDAO {
         }
     }
 
+    
+    fn save(&self, user: User) -> Result<User, ServiceError> {
+
+        
+        let result = diesel::update(users::dsl::users.filter(users::id.eq(user.id)))
+            .set((
+                users::encrypted_password.eq(user.encrypted_password),
+                users::avatar_icon.eq(user.avatar_icon)
+            ))
+            .execute(&self.get_connection()?);
+        return match result {
+            Ok(_) => {
+                return self.find(user.id);
+            },
+            Err(e) => Err(e.into())
+        };
+    }
 }
 
 
