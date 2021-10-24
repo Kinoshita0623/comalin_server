@@ -12,4 +12,5 @@ pub trait UserRepository {
     fn find_by_token(&self, token: &str) -> Result<User, ServiceError>;
     fn save_token(&self, token: NewUserToken) -> Result<(), ServiceError>;
     fn delete_token(&self, token: &str) -> Result<(), ServiceError>;
+    fn save(&self, user: User) -> Result<User, ServiceError>;
 }
