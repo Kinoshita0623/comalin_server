@@ -16,26 +16,9 @@ mod db;
 mod errors;
 mod router;
 
-use actix_web::{HttpResponse, HttpServer, Responder, web};
-use bigdecimal::BigDecimal;
-use diesel::prelude::*;
-use diesel::Connection;
-use diesel::dsl::sql;
-use crate::schema::questions;
-use crate::schema::users;
-use crate::schema::posts;
-use crate::post::entities;
-use crate::post::entities::Post;
-use crate::diesel_util::selectable::Selectable;
-use diesel::sql_types;
-use diesel_util::geography::*;
-use crate::question::entities::{NewQuestion, NewQuestionAttr, Question};
-use crate::user::entities::{PublicUser, User};
-use crate::user::commands::{NewUser, NewUserAttr};
+use actix_web::{HttpServer};
+
 use actix_web::App;
-use crate::auth::sample_middleware;
-use crate::auth::sample_middleware::SayHi;
-use crate::auth::auth_middleware::TokenAuth;
 use crate::app_module::AppModule;
 use std::env;
 use crate::db::DbConfig;
