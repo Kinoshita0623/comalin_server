@@ -1,5 +1,5 @@
 #[macro_use]
-extern crate diesel;
+pub extern crate diesel;
 extern crate crypto;
 
 #[macro_use]
@@ -76,11 +76,3 @@ async fn main() -> std::io::Result<()> {
     .await
 }
 
-
-async fn manual_hello() -> impl Responder {
-    HttpResponse::Ok().body("Hey there!")
-}
-
-async fn private_hello() -> impl Responder {
-    return HttpResponse::Ok().body("Private There!!");
-}
