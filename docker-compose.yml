@@ -17,7 +17,7 @@ services:
 
   postgis:
     container_name: psdb
-    image: postgis/postgis:latest
+    image: kartoza/postgis:latest
     environment:
       POSTGRES_USER: dbuser
       POSTGRES_DB:  database
