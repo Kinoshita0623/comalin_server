@@ -2,19 +2,11 @@ use std::pin::Pin;
 use std::task::{Context, Poll};
 
 use actix_web::{dev::ServiceRequest, dev::ServiceResponse, Error, HttpResponse};
-use actix_web::dev::{ResponseBody, Service, Transform};
+use actix_web::dev::{Service, Transform};
 use futures::future::{ok, Ready};
 use futures::Future;
-use actix_web::http::{HeaderName, HeaderValue};
-use actix_web::http::HeaderMap;
-use actix_web::http::Method;
-use actix_web::http::StatusCode;
-use actix_web::http::uri;
-use actix_web::http::Version;
 use actix_web::web::Data;
 use crate::app_module::AppModule;
-use crate::app_module;
-use crate::user::module;
 
 pub struct TokenAuth;
 

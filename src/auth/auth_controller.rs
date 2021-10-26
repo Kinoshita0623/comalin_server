@@ -2,7 +2,6 @@
 use actix_web::web;
 use actix_web::Responder;
 use actix_web::HttpResponse;
-use actix_web::Scope;
 use crate::app_module::AppModule;
 use crate::user::services::LoginRequest;
 use crate::user::services::RegisterRequest;
@@ -41,6 +40,3 @@ pub async fn register(data: web::Data<AppModule>, json: web::Json<RegisterReques
 
 }
 
-pub fn route(scope: Scope) {
-
-}
