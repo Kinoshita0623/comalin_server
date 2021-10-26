@@ -11,6 +11,21 @@ table! {
     use diesel::sql_types::*;
     use crate::diesel_util::sql_types::*;
 
+    files (id) {
+        id -> Uuid,
+        filename -> Varchar,
+        mime_type -> Varchar,
+        raw_name -> Nullable<Text>,
+        md5 -> Nullable<Varchar>,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::diesel_util::sql_types::*;
+
     posts (id) {
         id -> Int8,
         title -> Varchar,
@@ -81,6 +96,7 @@ joinable!(user_tokens -> users (user_id));
 
 allow_tables_to_appear_in_same_query!(
     addresses,
+    files,
     posts,
     questions,
     spatial_ref_sys,
