@@ -2,6 +2,7 @@ use validator::ValidationErrors;
 use actix_web::HttpResponse;
 use serde::Serialize;
 use actix_web::http::StatusCode;
+use actix_web::error::BlockingError;
 
 #[derive(Debug)]
 pub enum ServiceError {
@@ -59,5 +60,20 @@ impl ServiceError {
                 )
             }
         };
+    }
+}
+
+impl Into<ServiceError> for BlockingError<ServiceError> {
+
+    fn into(self) -> ServiceError {
+        match self {
+            BlockingError::Canceled => {
+                let res = ServiceError::InternalError { body: None };
+                return res;
+            },
+            BlockingError::Error(e) => {
+                return e;
+            }
+        }
     }
 }
