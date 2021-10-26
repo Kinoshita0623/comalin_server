@@ -30,6 +30,7 @@ mod test {
     use crate::app_module::AppModule;
 
 
+    #[test]
     fn test_get_user_repo() {
         use crate::db::DbConfig;
         let pool = DbConfig {

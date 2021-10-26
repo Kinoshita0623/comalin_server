@@ -4,7 +4,6 @@ use diesel::serialize::{IsNull, Output};
 use diesel::types::{FromSql, ToSql};
 use postgis::ewkb::Point;
 use crate::diesel_util::sql_types::Geography;
-use diesel::backend::Backend;
 
 #[sql_type="Geography"]
 #[derive(Debug, Copy, Clone, PartialEq, FromSqlRow, AsExpression)]

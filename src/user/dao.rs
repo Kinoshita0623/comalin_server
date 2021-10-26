@@ -9,7 +9,7 @@ use diesel::prelude::*;
 use diesel::result::Error as DieselError;
 use crate::errors::service_error::ServiceError;
 use log::{error, debug};
-use validator::{Validate, ValidationError, ValidateArgs};
+use validator::{ValidateArgs};
 use crate::schema::user_tokens;
 use crate::user::commands::{NewUser, NewUserToken};
 use crate::user::entities::{User, UserToken};

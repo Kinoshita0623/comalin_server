@@ -3,7 +3,6 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::NaiveDateTime;
 use crate::diesel_util::geography::GeographyPoint;
 use uuid::Uuid;
-use crate::diesel_util::sql_types::Geography;
 
 
 #[derive(Queryable)]
