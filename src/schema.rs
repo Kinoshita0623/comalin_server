@@ -16,7 +16,7 @@ table! {
         filename -> Varchar,
         mime_type -> Varchar,
         raw_name -> Nullable<Text>,
-        md5 -> Nullable<Varchar>,
+        hash -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
