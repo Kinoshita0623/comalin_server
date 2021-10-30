@@ -32,7 +32,7 @@ impl AppFileRepository for AppFileDAO {
         );
     }
 
-    fn find_by_hash(&self, hash: String) -> Result<AppFile, ServiceError> {
+    fn find_by_hash(&self, hash: &str) -> Result<AppFile, ServiceError> {
         let c = self.get_connectoin()?;
         let e: ServiceError = match files::dsl::files.filter(files::hash.eq(hash)).first::<AppFile>(&c) {
             Ok(f) => {
