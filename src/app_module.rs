@@ -3,15 +3,18 @@ use diesel::pg::PgConnection;
 use diesel::r2d2::ConnectionManager;
 use crate::user::module::{UserModule, UserModuleImpl};
 use crate::files::module::{AppFileModuleImpl, AppFileModule};
+use crate::config::AppConfig;
 
 pub struct AppModule {
-    pub pool: Box<Pool<ConnectionManager<PgConnection>>>
+    pub pool: Box<Pool<ConnectionManager<PgConnection>>>,
+    pub config: Box<AppConfig>
 }
 
 impl Clone for AppModule{
     fn clone(&self) -> Self{
         return Self {
-            pool: self.pool.clone()
+            pool: self.pool.clone(),
+            config: self.config.clone()
         }
     }
 }
