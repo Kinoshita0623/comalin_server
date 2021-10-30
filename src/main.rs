@@ -7,6 +7,7 @@ extern crate log;
 
 pub mod schema;
 pub mod app_module;
+pub mod config;
 mod user;
 mod question;
 mod post;
@@ -24,12 +25,18 @@ use crate::app_module::AppModule;
 use std::env;
 use crate::db::DbConfig;
 use env_logger::{Builder, Target};
+use crate::config::AppConfig;
 
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
     let mut builder = Builder::from_default_env();
+
+    let app_config = AppConfig {
+        app_url: String::new(),
+        max_file_capacity: 54000000
+    };
     builder.target(Target::Stdout);
     builder.init();
     let database_url = env::var("DATABASE_URL")
@@ -50,7 +57,8 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .data(
                 AppModule {
-                    pool: Box::new(pool.clone())
+                    pool: Box::new(pool.clone()),
+                    config: Box::new(app_config.clone())
                 }
             )
             .configure(router::route)
