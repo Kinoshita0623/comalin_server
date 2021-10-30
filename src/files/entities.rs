@@ -1,8 +1,10 @@
 use uuid::Uuid;
 use chrono::NaiveDateTime;
 use crate::schema::files;
+use serde::Serialize;
 
-#[derive(Queryable)]
+
+#[derive(Queryable, Serialize)]
 pub struct AppFile {
     pub id: Uuid,
     pub filename: String,
