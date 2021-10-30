@@ -11,11 +11,15 @@ use crate::config::AppConfig;
 use validator::ValidationError;
 
 
-#[derive(Debug)]
+#[derive(Debug, Validate)]
 pub struct MultipartFile {
     pub tmp_filepath: String,
+
+    #[validate(custom(function="within_capacity", arg="&'v_a AppConfig"))]
     pub capacity: usize,
     pub extenstion: String,
+
+    #[validate(custom(function="is_video_or_image"))]
     pub mime_type: String,
     pub raw_filename: String,
 }   
@@ -27,8 +31,8 @@ pub fn is_video_or_image(value: &str) -> Result<(), ValidationError> {
     return Err(ValidationError::new("now_allowed_file_types"));
 }
 
-pub fn within_capacity(value: &usize, arg: &AppConfig) -> Result<(), ValidationError> {
-    if value < &arg.max_file_capacity {
+pub fn within_capacity(value: usize, arg: &AppConfig) -> Result<(), ValidationError> {
+    if value < arg.max_file_capacity {
         return Ok(());
     }
     return Err(ValidationError::new("now_allowed_file_capacity"));

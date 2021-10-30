@@ -86,7 +86,7 @@ pub async fn upload(data: web::Data<AppModule>, mut payload: Multipart) -> Resul
 
     let files: Vec<&AppFile> = results.iter().filter_map(|result| match result {
         Ok(file) => Some(file.clone()),
-        Err(e) => None,
+        Err(_) => None,
     }).collect();
 
     // TODO: エラー処理を適切に実装すること
