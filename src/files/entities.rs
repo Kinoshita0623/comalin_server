@@ -9,7 +9,6 @@ pub struct AppFile {
     pub id: Uuid,
     pub filename: String,
     pub mime_type: String,
-    pub raw_name: Option<String>,
     pub hash: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime
@@ -21,6 +20,5 @@ pub struct NewAppFile {
     pub id: Uuid,
     pub filename: String,
     pub mime_type: String,
-    pub raw_name: String,
     pub hash: String,
 }

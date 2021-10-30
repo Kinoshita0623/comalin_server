@@ -122,7 +122,6 @@ impl AppFileService for AppFileServiceImpl {
             id: Uuid::new_v4(),
             filename: filename.to_string(),
             mime_type: file.mime_type.clone(),
-            raw_name: file.raw_filename.clone(),
             hash: str_hash.to_string()
         };
         let file = match self.file_module.app_file_reposiitory().create(&new_file) {

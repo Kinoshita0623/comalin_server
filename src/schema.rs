@@ -15,7 +15,6 @@ table! {
         id -> Uuid,
         filename -> Varchar,
         mime_type -> Varchar,
-        raw_name -> Nullable<Text>,
         hash -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
