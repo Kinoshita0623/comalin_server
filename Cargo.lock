@@ -1496,6 +1496,7 @@ dependencies = [
  "futures",
  "infer",
  "log",
+ "mime",
  "mime_guess",
  "postgis",
  "rust-crypto",
