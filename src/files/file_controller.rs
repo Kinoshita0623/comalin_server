@@ -3,37 +3,14 @@ use futures::{StreamExt, TryStreamExt};
 use actix_web::web::Bytes;
 use uuid::Uuid;
 use std::io::Write;
-use blake2::{Blake2b, Digest};
-use std::{fs, io};
 use crate::app_module::AppModule;
-use crate::files::repositories::AppFileRepository;
-use crate::errors::service_error::ServiceError;
 use std::vec::Vec;
 use std::str;
+use crate::files::entities::AppFile;
+use crate::errors::service_error::ServiceError;
 
 use actix_web::{web, Error, HttpResponse};
-
-#[derive(Debug)]
-pub struct MultipartFile {
-    pub tmp_filepath: String,
-    pub capacity: usize,
-    pub extenstion: String,
-    pub mime_type: String,
-    pub raw_filename: String,
-}   
-
-#[derive(Debug)]
-pub struct MultipartText {
-    pub body: String
-}
-
-#[derive(Debug)]
-pub enum MultipartField {
-    File (MultipartFile),
-    Text {
-        text: String
-    }
-}
+use crate::files::services::*;
 
 
 pub async fn upload(data: web::Data<AppModule>, mut payload: Multipart) -> Result<HttpResponse, Error>{
@@ -100,6 +77,47 @@ pub async fn upload(data: web::Data<AppModule>, mut payload: Multipart) -> Resul
         };
 
     }
+    let results: Vec<Result<AppFile, ServiceError>> = fields.iter().filter_map(|mf| match mf {
+        MultipartField::File(f) => Some(f),
+        MultipartField::Text{ text: _ } => None
+    })
+    .map(|mf| data.as_ref().file_module().app_file_service().save(mf))
+    .collect();
+
+    let files: Vec<&AppFile> = results.iter().filter_map(|result| match result {
+        Ok(file) => Some(file.clone()),
+        Err(e) => None,
+    }).collect();
+
+    /*for field in fields {
+        match field {
+            MultipartField::File(f) => f,
+            MultipartField::Text { text: _ } => {
+                ServiceError::
+            }
+        }
+    }*/
+    
+    /*let files: Vec<&AppFile> = results.iter().filter_map(|result| match result {
+        Ok(file) => Some(file),
+        Err(_) => None
+    }).collect();
+*/
+    /*if results.len() != files.len() {
+        return 
+    }
+
+    for result in reuslts {
+        match result {
+            Ok()
+        }
+    }*/
+        
+
+    return Ok(
+        HttpResponse::Ok().json(files)
+    );
+        
     println!("fields:{:?}", fields);
     return Ok(HttpResponse::Ok().into());
 }
