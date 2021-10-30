@@ -4,7 +4,7 @@ use serde::Serialize;
 use actix_web::http::StatusCode;
 use actix_web::error::BlockingError;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum ServiceError {
     AuthenticationError,
     ValidationError {
