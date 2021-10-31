@@ -106,7 +106,7 @@ impl AppFileService for AppFileServiceImpl {
             return Err(e);
         }
 
-        let filename = Uuid::new_v4().to_string() + &file.extenstion;
+        let filename = format!("{}.{}", Uuid::new_v4().to_string(), &file.extenstion);
         let path = format!("./storage/public/{}", filename);
 
         if let Err(e) = fs::rename(file.tmp_filepath.clone(), path) {
