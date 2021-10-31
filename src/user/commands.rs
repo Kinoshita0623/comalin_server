@@ -98,6 +98,9 @@ mod test {
             username: "hogehoge".to_string(),
             encrypted_password: "hogehoge".to_string(),
             avatar_icon: None,
+            questions_count: 0,
+            answers_count: 0,
+            thanks_count: 0,
             created_at: now,
             updated_at: now,
         };

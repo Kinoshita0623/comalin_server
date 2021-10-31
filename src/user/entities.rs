@@ -13,6 +13,9 @@ pub struct User {
     pub id: Uuid,
     pub username: String,
     pub avatar_icon: Option<String>,
+    pub questions_count: i32,
+    pub answers_count: i32,
+    pub thanks_count: i32,
     pub encrypted_password: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime
@@ -23,14 +26,17 @@ pub struct PublicUser {
     pub id: Uuid,
     pub username: String,
     pub avatar_icon: Option<String>,
+    pub questions_count: i32,
+    pub answers_count: i32,
+    pub thanks_count: i32,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
 
 impl Selectable for PublicUser {
-    type Columns = (users::id, users::username, users::avatar_icon, users::created_at, users::updated_at);
+    type Columns = (users::id, users::username, users::avatar_icon, users::questions_count, users::answers_count, users::thanks_count, users::created_at, users::updated_at);
     fn columns() -> Self::Columns {
-        return (users::id, users::username, users::avatar_icon, users::created_at, users::updated_at);
+        return (users::id, users::username, users::avatar_icon, users::questions_count, users::answers_count, users::thanks_count, users::created_at, users::updated_at);
     }
 }
 
@@ -88,6 +94,9 @@ impl Into<PublicUser> for User {
             id: self.id,
             username: self.username,
             avatar_icon: self.avatar_icon,
+            questions_count: self.questions_count,
+            answers_count: self.answers_count,
+            thanks_count: self.thanks_count,
             created_at: self.created_at,
             updated_at: self.updated_at
         };

@@ -45,6 +45,7 @@ table! {
         location_point -> Geography,
         address_id -> Nullable<Uuid>,
         user_id -> Uuid,
+        answers_count -> Int4,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -83,6 +84,9 @@ table! {
         id -> Uuid,
         username -> Varchar,
         avatar_icon -> Nullable<Varchar>,
+        questions_count -> Int4,
+        answers_count -> Int4,
+        thanks_count -> Int4,
         encrypted_password -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
