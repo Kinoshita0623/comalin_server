@@ -36,6 +36,19 @@ table! {
     use diesel::sql_types::*;
     use crate::diesel_util::sql_types::*;
 
+    question_files (id) {
+        id -> Int8,
+        file_id -> Uuid,
+        question_id -> Uuid,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::diesel_util::sql_types::*;
+
     questions (id) {
         id -> Uuid,
         title -> Varchar,
@@ -93,6 +106,8 @@ table! {
     }
 }
 
+joinable!(question_files -> files (file_id));
+joinable!(question_files -> questions (question_id));
 joinable!(questions -> addresses (address_id));
 joinable!(questions -> users (user_id));
 joinable!(user_tokens -> users (user_id));
@@ -101,6 +116,7 @@ allow_tables_to_appear_in_same_query!(
     addresses,
     files,
     posts,
+    question_files,
     questions,
     spatial_ref_sys,
     user_tokens,
