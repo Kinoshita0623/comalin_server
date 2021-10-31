@@ -3,10 +3,25 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::NaiveDateTime;
 use crate::diesel_util::geography::GeographyPoint;
 use uuid::Uuid;
+use crate::schema::question_files;
 
+#[derive(PartialEq)]
+pub struct Question {
+    pub id: Uuid,
+    pub title: String,
+    pub text: Option<String>,
+    pub longitude: BigDecimal,
+    pub latitude: BigDecimal,
+    pub address_id: Option<Uuid>,
+    pub user_id: Uuid,
+    pub file_ids: Vec<Uuid>,
+    pub answers_count: i32,
+    pub created_at: Option<NaiveDateTime>,
+    pub updated_at: Option<NaiveDateTime>
+}
 
 #[derive(Queryable)]
-pub struct Question {
+pub struct QuestionDTO {
     pub id: Uuid,
     pub title: String,
     pub text: Option<String>,
@@ -15,6 +30,7 @@ pub struct Question {
     pub location_point: GeographyPoint,
     pub address_id: Option<Uuid>,
     pub user_id: Uuid,
+    pub answers_count: i32,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
@@ -40,6 +56,22 @@ pub struct NewQuestionAttr<'a> {
     pub user_id: &'a Uuid
 }
 
+#[derive(Insertable)]
+#[table_name="question_files"]
+pub struct NewQuestionFile {
+    pub file_id: Uuid,
+    pub question_id: Uuid
+}
+
+#[derive(Queryable)]
+pub struct QuestionFile {
+    pub id: i64,
+    pub file_id: Uuid,
+    pub question_id: Uuid,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime
+}
+
 
 impl NewQuestion {
     pub fn new(new_question_attr: NewQuestionAttr) -> Result<NewQuestion, ()> {
@@ -61,5 +93,25 @@ impl NewQuestion {
             }
         };
         return Ok(n);
+    }
+}
+
+impl Into<Question> for (QuestionDTO, Vec<QuestionFile>) {
+    fn into(self) -> Question {
+        let q = self.0;
+        let files = self.1;
+        return Question {
+            id: q.id,
+            title: q.title,
+            text: q.text,
+            longitude: q.longitude,
+            latitude: q.latitude,
+            address_id: q.address_id,
+            user_id: q.user_id,
+            file_ids: files.iter().map(|qf| qf.file_id).collect(),
+            answers_count: q.answers_count,
+            created_at: Some(q.created_at),
+            updated_at: Some(q.updated_at)
+        };
     }
 }
