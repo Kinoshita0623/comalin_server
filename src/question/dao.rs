@@ -14,7 +14,7 @@ use crate::question::entities::{QuestionDTO, QuestionFile, NewQuestionFile};
 use diesel::expression::dsl::now;
 
 pub struct PgQuestionDAO {
-    pool: Box<Pool<ConnectionManager<PgConnection>>>,
+    pub pool: Box<Pool<ConnectionManager<PgConnection>>>,
 }
 
 impl QuestionRepository for PgQuestionDAO {
@@ -107,7 +107,7 @@ impl QuestionRepository for PgQuestionDAO {
                 return Err(e.into());
             }
 
-            let files: Vec<QuestionFile> = question.file_ids.iter().map(move |file_id: &Uuid| -> Result<QuestionFile, ServiceError> {
+            let results: Vec<Result<QuestionFile, ServiceError>> = question.file_ids.iter().map(move |file_id: &Uuid| -> Result<QuestionFile, ServiceError> {
                 let result = diesel::insert_into(question_files::dsl::question_files)
                 .values(
                     NewQuestionFile {
@@ -120,18 +120,12 @@ impl QuestionRepository for PgQuestionDAO {
                     Ok(qf) => Ok(qf),
                     Err(e) => Err(e.into())
                 }
-            })
-            .filter_map(|result| match result {
-                Ok(f) => Some(f),
-                Err(_) => None
             }).collect();
 
-            if files.len() != question.file_ids.len() {
-                return Err(
-                    ServiceError::InternalError {
-                        body: None
-                    }
-                )
+            for result in results {
+                if let Err(e) = result {
+                    return Err(e);
+                }
             }
 
         }
