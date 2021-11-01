@@ -16,7 +16,8 @@ mod auth;
 mod db;
 mod errors;
 mod router;
-mod files;
+pub mod files;
+
 
 use actix_web::{HttpServer};
 
