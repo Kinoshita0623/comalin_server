@@ -4,6 +4,7 @@ use diesel::r2d2::ConnectionManager;
 use crate::user::module::{UserModule, UserModuleImpl};
 use crate::files::module::{AppFileModuleImpl, AppFileModule};
 use crate::config::AppConfig;
+use crate::question::module::{QuestionModule, QuestionModuleImpl};
 
 pub struct AppModule {
     pub pool: Box<Pool<ConnectionManager<PgConnection>>>,
@@ -32,6 +33,15 @@ impl AppModule {
         return Box::new(
             AppFileModuleImpl::new(pool)
         );
+    }
+
+    pub fn question_module(&self) -> Box<dyn QuestionModule> {
+        return Box::new(
+            QuestionModuleImpl {
+                pool: self.pool.clone(),
+                user_module: self.user_module()
+            }
+        )
     }
 }
 
