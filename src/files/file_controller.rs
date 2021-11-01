@@ -84,7 +84,7 @@ pub async fn upload(data: web::Data<AppModule>, mut payload: Multipart) -> Resul
     .map(|mf| data.as_ref().file_module().app_file_service().save(mf))
     .collect();
 
-    let files: Vec<&AppFile> = results.iter().filter_map(|result| match result {
+    let files: Vec<AppFile> = results.iter().filter_map(|result| match result {
         Ok(file) => Some(file.clone()),
         Err(_) => None,
     }).collect();
