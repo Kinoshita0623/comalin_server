@@ -4,6 +4,8 @@ use chrono::NaiveDateTime;
 use crate::diesel_util::geography::GeographyPoint;
 use uuid::Uuid;
 use crate::schema::question_files;
+use crate::user::entities::User;
+use crate::files::entities::AppFile;
 
 #[derive(PartialEq)]
 pub struct Question {
@@ -20,7 +22,10 @@ pub struct Question {
     pub updated_at: Option<NaiveDateTime>
 }
 
-#[derive(Queryable)]
+#[derive(Queryable, Identifiable, Associations)]
+#[belongs_to(User, foreign_key="user_id")]
+#[table_name="questions"]
+#[primary_key(id)]
 pub struct QuestionDTO {
     pub id: Uuid,
     pub title: String,
@@ -63,7 +68,11 @@ pub struct NewQuestionFile {
     pub question_id: Uuid
 }
 
-#[derive(Queryable)]
+
+#[derive(Queryable, Identifiable, PartialEq, Associations, Clone)]
+#[belongs_to(AppFile, foreign_key="file_id")]
+#[belongs_to(QuestionDTO, foreign_key="question_id")]
+#[table_name="question_files"]
 pub struct QuestionFile {
     pub id: i64,
     pub file_id: Uuid,
@@ -113,5 +122,27 @@ impl Into<Question> for (QuestionDTO, Vec<QuestionFile>) {
             created_at: Some(q.created_at),
             updated_at: Some(q.updated_at)
         };
+    }
+}
+
+impl From<&Question> for QuestionDTO {
+    fn from(from: &Question) -> QuestionDTO{
+        return QuestionDTO {
+            id: from.id,
+            title: from.title.clone(),
+            text: from.text.clone(),
+            latitude: from.latitude.clone(),
+            longitude: from.longitude.clone(),
+            location_point: GeographyPoint {
+                srid: Some(4326),
+                x: from.longitude.to_f64().unwrap(),
+                y: from.latitude.to_f64().unwrap()
+            },
+            address_id: from.address_id,
+            answers_count: from.answers_count,
+            user_id: from.user_id,
+            created_at: from.created_at.unwrap(),
+            updated_at: from.updated_at.unwrap()
+        }
     }
 }
