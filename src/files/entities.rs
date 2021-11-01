@@ -4,7 +4,8 @@ use crate::schema::files;
 use serde::Serialize;
 
 
-#[derive(Queryable, Serialize)]
+#[derive(Identifiable, Queryable, PartialEq, Serialize, Clone)]
+#[table_name="files"]
 pub struct AppFile {
     pub id: Uuid,
     pub filename: String,
