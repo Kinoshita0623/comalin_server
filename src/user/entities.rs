@@ -8,7 +8,8 @@ use crate::user::commands::RawToken;
 use serde::Serialize;
 use bcrypt::{BcryptError, DEFAULT_COST};
 
-#[derive(Queryable, Identifiable)]
+#[derive(Queryable, Identifiable, Clone)]
+#[table_name="users"]
 pub struct User {
     pub id: Uuid,
     pub username: String,
@@ -21,7 +22,7 @@ pub struct User {
     pub updated_at: NaiveDateTime
 }
 
-#[derive(Queryable, Serialize)]
+#[derive(Queryable, Serialize, Clone)]
 pub struct PublicUser {
     pub id: Uuid,
     pub username: String,
