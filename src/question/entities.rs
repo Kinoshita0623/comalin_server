@@ -7,7 +7,7 @@ use crate::schema::question_files;
 use crate::user::entities::User;
 use crate::files::entities::AppFile;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub struct Question {
     pub id: Uuid,
     pub title: String,

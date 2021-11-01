@@ -17,8 +17,9 @@ pub fn route(cfg: &mut web::ServiceConfig) {
             )
             .service(
                 web::scope("/questions")
-                    .wrap(TokenAuth{})
-                    .route("", web::post().to(question_controller::create))
+                .wrap(TokenAuth{})
+                .route("", web::get().to(question_controller::all))
+                .route("", web::post().to(question_controller::create))
             )
     );
 }

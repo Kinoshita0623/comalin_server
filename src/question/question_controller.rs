@@ -21,3 +21,11 @@ pub async fn create(data: web::Data<AppModule>, req: HttpRequest, json: web::Jso
     };
 
 }
+
+
+pub async fn all(data: web::Data<AppModule>) -> impl Responder {
+    return match data.question_module().question_service().find_all() {
+        Ok(res) => HttpResponse::Ok().json(res),
+        Err(e) => e.response()
+    };
+}

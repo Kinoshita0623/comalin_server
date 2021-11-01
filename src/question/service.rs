@@ -18,8 +18,9 @@ use crate::files::entities::AppFile;
 use std::collections::HashMap;
 use std::hash::Hash;
 use bigdecimal::ToPrimitive;
+use crate::schema::questions;
 
-#[derive(Validate, Deserialize)]
+#[derive(Validate, Deserialize, Debug)]
 pub struct CreateQuestion {
     #[validate(required)]
     pub title: Option<String>,
@@ -45,7 +46,6 @@ pub struct QuestionView {
     pub user_id: Uuid,
     pub user: PublicUser,
     pub files: Vec<QuestionFileView>,
-    pub file_ids: Vec<Uuid>,
     pub answers_count: i32,
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>
@@ -54,11 +54,12 @@ pub struct QuestionView {
 #[derive(Serialize, Clone)]
 pub struct QuestionFileView {
     pub url: String,
-    pub name: String
+    pub name: String,
 }
 
 pub trait QuestionService {
     fn create(&self, token: &str, question: &CreateQuestion) -> Result<QuestionView, ServiceError>;
+    fn find_all(&self) -> Result<Vec<QuestionView>, ServiceError>;
 }
 
 pub struct QuestionServiceImpl {
@@ -71,29 +72,35 @@ impl QuestionService for QuestionServiceImpl {
     fn create(&self, token: &str, question: &CreateQuestion) -> Result<QuestionView, ServiceError> {
         let user = self.user_module.user_repository().find_by_token(&token)?;
         let q: Question = (&user, question.clone()).into();
-        let q = self.question_module.question_repository().create(&q)?;
+        let q: Question = self.question_module.question_repository().create(&q)?;
 
-        let questions = self.load_question_views_from_questions(vec![q])?;
+        let dto = QuestionDTO::from(&q);
+        let questions = self.load_question_views_from_questions(vec![dto])?;
         return match questions.get(0) {
             Some(q) => Ok(q.clone()),
             None => return Err(ServiceError::InternalError{ body: None })
         }
     }
 
+    fn find_all(&self) -> Result<Vec<QuestionView>, ServiceError> {
+        let c = self.get_connection()?;
+        let questions = match questions::dsl::questions.load::<QuestionDTO>(&c) {
+            Ok(list) => list,
+            Err(e) => return Err(e.into())
+        };
+        return self.load_question_views_from_questions(questions);
+    }
+
 }
 
 impl QuestionServiceImpl {
 
-    fn load_question_views_from_questions(&self, questions: Vec<Question>) -> Result<Vec<QuestionView>, ServiceError> {
+    fn load_question_views_from_questions(&self, questions: Vec<QuestionDTO>) -> Result<Vec<QuestionView>, ServiceError> {
         use crate::schema::question_files;
         use crate::schema::files;
         use crate::schema::users;
         let c = self.get_connection()?;
-        let list: Vec<QuestionDTO> = questions.iter()
-            .map(|q: &Question| -> QuestionDTO {
-                return QuestionDTO::from(q.clone())
-            })
-            .collect();
+        
 
         let question_ids: Vec<Uuid> = questions.iter().map(|q| q.id).collect();
 
@@ -110,13 +117,20 @@ impl QuestionServiceImpl {
         let qf_and_af_map: HashMap<Uuid, Vec<(QuestionFile, AppFile)>> = group_by(qf_and_af, |v| v.0.question_id);
 
 
-        let user_ids: Vec<Uuid> = list.iter().map(|q| q.user_id).collect();
+        let user_ids: Vec<Uuid> = questions.iter().map(|q| q.user_id).collect();
         let users: HashMap<Uuid, User> = match users::dsl::users.filter(users::id.eq_any(user_ids)).load::<User>(&c) {
             Ok(users) => users.into_iter().map(|u| (u.id, u)).collect(),
             Err(e) => return Err(e.into())
         };
 
-        let views: Vec<QuestionView> = questions.iter().map(|q: &Question| -> QuestionView {
+        let views: Vec<QuestionView> = questions.iter().map(|q: &QuestionDTO| -> QuestionView {
+            let files = match qf_and_af_map.get(&q.id) {
+                Some(files) => files.iter().map(|f| QuestionFileView {
+                    url: "".to_string(),
+                    name: f.1.filename.clone()
+                }).collect(),
+                None => Vec::new()
+            };
             return QuestionView {
                 id: q.id,
                 title: q.title.clone(),
@@ -125,16 +139,9 @@ impl QuestionServiceImpl {
                 longitude: q.longitude.to_f64().unwrap(),
                 answers_count: q.answers_count,
                 address: None,
-                files: match qf_and_af_map.get(&q.id) {
-                    Some(files) => files.iter().map(|f| QuestionFileView {
-                        url: "".to_string(),
-                        name: f.1.filename.clone()
-                    }).collect(),
-                    None => Vec::new()
-                },
-                file_ids: q.file_ids.clone(),
-                created_at: q.created_at,
-                updated_at: q.updated_at,
+                files: files.clone(),
+                created_at: Some(q.created_at.clone()),
+                updated_at: Some(q.updated_at.clone()),
                 user: (users.get(&q.user_id).unwrap().clone()).into(),
                 user_id: q.user_id
             };
