@@ -84,34 +84,3 @@ impl Into<NewUserToken> for RawToken {
 
 
 
-mod test {
-    use chrono::Utc;
-    use uuid::Uuid;
-    use crate::user::entities::{User, UserToken};
-    use crate::user::commands::NewUserToken;
-
-    #[test]
-    fn test_make_token () {
-        let now = Utc::now().naive_utc();
-        let user = User {
-            id: Uuid::new_v4(),
-            username: "hogehoge".to_string(),
-            encrypted_password: "hogehoge".to_string(),
-            avatar_icon: None,
-            questions_count: 0,
-            answers_count: 0,
-            thanks_count: 0,
-            created_at: now,
-            updated_at: now,
-        };
-        let raw_token = &user.make_token();
-        let new_token = NewUserToken::from(raw_token);
-        let token = UserToken {
-            id: Uuid::new_v4(),
-            user_id: user.id,
-            hashed_token: new_token.hashed_token,
-            created_at: now
-        };
-        assert!(token.check_token(&raw_token.token))
-    }
-}

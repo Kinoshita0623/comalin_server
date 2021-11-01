@@ -23,15 +23,21 @@ use crate::schema::questions;
 #[derive(Validate, Deserialize, Debug)]
 pub struct CreateQuestion {
     #[validate(required)]
+    #[validate(length(min = 1, max = 20))]
     pub title: Option<String>,
+
+    #[validate(length(min = 0, max = 3000))]
     pub text: Option<String>,
 
     #[validate(required)]
+    #[validate(range(min = -90, max = 90))]
     pub latitude: Option<f64>,
     #[validate(required)]
+    #[validate(range(min = 0, max = 180))]
     pub longitude: Option<f64>,
 
     #[validate(required)]
+    #[validate(length(max = 10))]
     pub file_ids: Option<Vec<Uuid>>
 }
 
@@ -71,6 +77,11 @@ pub struct QuestionServiceImpl {
 impl QuestionService for QuestionServiceImpl {
     fn create(&self, token: &str, question: &CreateQuestion) -> Result<QuestionView, ServiceError> {
         let user = self.user_module.user_repository().find_by_token(&token)?;
+        if let Err(e) = question.validate() {
+            return Err(ServiceError::ValidationError {
+                body: e
+            });
+        }
         let q: Question = (&user, question.clone()).into();
         let q: Question = self.question_module.question_repository().create(&q)?;
 

@@ -80,13 +80,7 @@ impl User {
 }
 
 
-impl UserToken {
-    pub fn check_token(&self, token: &String) -> bool {
-        let mut sha256 = Sha256::new();
-        sha256.input_str(token);
-        return sha256.result_str() == self.hashed_token;
-    }
-}
+
 
 
 impl Into<PublicUser> for User {

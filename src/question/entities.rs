@@ -6,13 +6,21 @@ use uuid::Uuid;
 use crate::schema::question_files;
 use crate::user::entities::User;
 use crate::files::entities::AppFile;
+use validator::Validate;
+use validator::ValidationError;
 
-#[derive(PartialEq, Clone)]
+
+#[derive(PartialEq, Clone, Validate)]
 pub struct Question {
     pub id: Uuid,
     pub title: String,
     pub text: Option<String>,
+
+    #[validate(custom(function="is_longitude_within_range"))]
     pub longitude: BigDecimal,
+
+    #[validate(custom(function="is_latitude_within_range"))]
+
     pub latitude: BigDecimal,
     pub address_id: Option<Uuid>,
     pub user_id: Uuid,
@@ -20,6 +28,20 @@ pub struct Question {
     pub answers_count: i32,
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>
+}
+
+pub fn is_latitude_within_range(value: &BigDecimal) -> Result<(), ValidationError>{
+    if value.to_f64().unwrap() >= -90.0 && value.to_f64().unwrap() <= 90.0 {
+        return Ok(());
+    }
+    return Err(ValidationError::new("latitude_out_of_range"));
+}
+
+pub fn is_longitude_within_range(value: &BigDecimal) -> Result<(), ValidationError> {
+    if value.to_f64().unwrap() >= 0.0 && value.to_f64().unwrap() <= 180.0 {
+        return Ok(());
+    }
+    return Err(ValidationError::new("latitude_out_of_range"));
 }
 
 #[derive(Queryable, Identifiable, Associations)]

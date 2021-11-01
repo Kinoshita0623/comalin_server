@@ -12,6 +12,8 @@ use bigdecimal::ToPrimitive;
 use diesel::prelude::*;
 use crate::question::entities::{QuestionDTO, QuestionFile, NewQuestionFile};
 use diesel::expression::dsl::now;
+use crate::question::entities::Question;
+use validator::{Validate};
 
 pub struct PgQuestionDAO {
     pub pool: Box<Pool<ConnectionManager<PgConnection>>>,
@@ -20,6 +22,13 @@ pub struct PgQuestionDAO {
 impl QuestionRepository for PgQuestionDAO {
 
     fn create(&self, question: &Question) -> Result<Question, ServiceError> {
+        if let Err(e) = question.clone().validate() {
+            return Err(
+                ServiceError::ValidationError {
+                    body: e
+                }
+            );
+        }
         let c = self.get_connection()?;
         let dto: QuestionDTO = match diesel::insert_into(questions::dsl::questions).values(
             &NewQuestion {
