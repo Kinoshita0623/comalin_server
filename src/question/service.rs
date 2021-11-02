@@ -20,6 +20,9 @@ use std::hash::Hash;
 use bigdecimal::ToPrimitive;
 use crate::schema::questions;
 use crate::config::AppConfig;
+use crate::files::repositories::AppFileRepository;
+use validator::ValidationError;
+use validator::ValidateArgs;
 
 #[derive(Validate, Deserialize, Debug)]
 pub struct CreateQuestion {
@@ -39,7 +42,21 @@ pub struct CreateQuestion {
 
     #[validate(required)]
     #[validate(length(max = 10))]
+    #[validate(custom(function="is_exists_files", arg="&'v_a AppFileRepository"))]
     pub file_ids: Option<Vec<Uuid>>
+}
+
+pub fn is_exists_files(ids: &Vec<Uuid>, arg: &dyn AppFileRepository) -> Result<(), ValidationError>{
+    
+    let files = match arg.find_in(ids) {
+        Ok(files) => files,
+        Err(_) => return Err(ValidationError::new("file_not_exists"))
+    };
+
+    if files.len() != ids.len() {
+        return Err(ValidationError::new("file_not_exists"))
+    }
+    return Ok(())
 }
 
 #[derive(Serialize, Clone)]
@@ -73,13 +90,14 @@ pub struct QuestionServiceImpl {
     pub pool: Box<Pool<ConnectionManager<PgConnection>>>,
     pub question_module: Box<dyn QuestionModule>,
     pub user_module: Box<dyn UserModule>,
+    pub file_repository: Box<dyn AppFileRepository>,
     pub config: Box<AppConfig>,
 }
 
 impl QuestionService for QuestionServiceImpl {
     fn create(&self, token: &str, question: &CreateQuestion) -> Result<QuestionView, ServiceError> {
         let user = self.user_module.user_repository().find_by_token(&token)?;
-        if let Err(e) = question.validate() {
+        if let Err(e) = question.validate_args(self.file_repository.as_ref()) {
             return Err(ServiceError::ValidationError {
                 body: e
             });

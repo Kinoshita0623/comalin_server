@@ -40,7 +40,8 @@ impl AppModule {
             QuestionModuleImpl {
                 pool: self.pool.clone(),
                 user_module: self.user_module(),
-                config: self.config.clone()
+                config: self.config.clone(),
+                file_module: self.file_module()
             }
         )
     }
