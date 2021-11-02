@@ -2,6 +2,7 @@ use uuid::Uuid;
 use crate::errors::service_error::ServiceError;
 use crate::user::commands::{NewUser, NewUserToken};
 use crate::user::entities::User;
+use std::vec::Vec;
 
 
 pub trait UserRepository {
@@ -13,4 +14,5 @@ pub trait UserRepository {
     fn save_token(&self, token: NewUserToken) -> Result<(), ServiceError>;
     fn delete_token(&self, token: &str) -> Result<(), ServiceError>;
     fn save(&self, user: User) -> Result<User, ServiceError>;
+    fn find_in(&self, ids: &Vec<Uuid>) -> Result<Vec<User>, ServiceError>;
 }

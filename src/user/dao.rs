@@ -130,6 +130,14 @@ impl UserRepository for PgUserDAO {
             Err(e) => Err(e.into())
         };
     }
+
+    fn find_in(&self, ids: &Vec<Uuid>) -> Result<Vec<User>, ServiceError> {
+        let c = self.get_connection()?;
+        return match users::dsl::users.filter(users::id.eq_any(ids)).load::<User>(&c) {
+            Ok(users) => Ok(users),
+            Err(e) => Err(e.into())
+        }
+    }
 }
 
 

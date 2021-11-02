@@ -6,7 +6,7 @@ use crate::files::entities::{NewAppFile, AppFile};
 use crate::schema::files;
 use log::{error, debug};
 use diesel::prelude::*;
-
+use uuid::Uuid;
 
 pub struct AppFileDAO {
     pub pool: Box<Pool<ConnectionManager<PgConnection>>>
@@ -41,6 +41,15 @@ impl AppFileRepository for AppFileDAO {
             Err(e) => e.into()
         };
         return Err(e);
+    }
+
+    fn find_in(&self, ids: &Vec<Uuid>) -> Result<Vec<AppFile>, ServiceError> {
+        let c = self.get_connectoin()?;
+        return match files::dsl::files.filter(files::id.eq_any(ids))
+            .load::<AppFile>(&c) {
+            Ok(files) => Ok(files),
+            Err(e) => Err(e.into())
+        };
     }
 }
 
