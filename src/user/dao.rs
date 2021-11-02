@@ -120,7 +120,8 @@ impl UserRepository for PgUserDAO {
         let result = diesel::update(users::dsl::users.filter(users::id.eq(user.id)))
             .set((
                 users::encrypted_password.eq(user.encrypted_password),
-                users::avatar_icon.eq(user.avatar_icon)
+                users::avatar_id.eq(user.avatar_id),
+                users::avatar_url.eq(user.avatar_url)
             ))
             .execute(&self.get_connection()?);
         return match result {

@@ -19,6 +19,7 @@ use std::collections::HashMap;
 use std::hash::Hash;
 use bigdecimal::ToPrimitive;
 use crate::schema::questions;
+use crate::config::AppConfig;
 
 #[derive(Validate, Deserialize, Debug)]
 pub struct CreateQuestion {
@@ -72,6 +73,7 @@ pub struct QuestionServiceImpl {
     pub pool: Box<Pool<ConnectionManager<PgConnection>>>,
     pub question_module: Box<dyn QuestionModule>,
     pub user_module: Box<dyn UserModule>,
+    pub config: Box<AppConfig>,
 }
 
 impl QuestionService for QuestionServiceImpl {
@@ -137,7 +139,7 @@ impl QuestionServiceImpl {
         let views: Vec<QuestionView> = questions.iter().map(|q: &QuestionDTO| -> QuestionView {
             let files = match qf_and_af_map.get(&q.id) {
                 Some(files) => files.iter().map(|f| QuestionFileView {
-                    url: "".to_string(),
+                    url: f.1.get_url(self.config.as_ref()),
                     name: f.1.filename.clone()
                 }).collect(),
                 None => Vec::new()

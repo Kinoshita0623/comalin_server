@@ -7,13 +7,16 @@ use crypto::sha2::Sha256;
 use crate::user::commands::RawToken;
 use serde::Serialize;
 use bcrypt::{BcryptError, DEFAULT_COST};
+use crate::config::AppConfig;
+use crate::files::entities::AppFile;
 
 #[derive(Queryable, Identifiable, Clone)]
 #[table_name="users"]
 pub struct User {
     pub id: Uuid,
     pub username: String,
-    pub avatar_icon: Option<String>,
+    pub avatar_id: Option<Uuid>,
+    pub avatar_url: Option<String>,
     pub questions_count: i32,
     pub answers_count: i32,
     pub thanks_count: i32,
@@ -26,7 +29,8 @@ pub struct User {
 pub struct PublicUser {
     pub id: Uuid,
     pub username: String,
-    pub avatar_icon: Option<String>,
+    pub avatar_id: Option<Uuid>,
+    pub avatar_url: Option<String>,
     pub questions_count: i32,
     pub answers_count: i32,
     pub thanks_count: i32,
@@ -35,9 +39,9 @@ pub struct PublicUser {
 }
 
 impl Selectable for PublicUser {
-    type Columns = (users::id, users::username, users::avatar_icon, users::questions_count, users::answers_count, users::thanks_count, users::created_at, users::updated_at);
+    type Columns = (users::id, users::username, users::avatar_id, users::avatar_url, users::questions_count, users::answers_count, users::thanks_count, users::created_at, users::updated_at);
     fn columns() -> Self::Columns {
-        return (users::id, users::username, users::avatar_icon, users::questions_count, users::answers_count, users::thanks_count, users::created_at, users::updated_at);
+        return (users::id, users::username, users::avatar_id, users::avatar_url, users::questions_count, users::answers_count, users::thanks_count, users::created_at, users::updated_at);
     }
 }
 
@@ -74,8 +78,17 @@ impl User {
         return Ok(());
     }
 
-    pub fn set_avatar_icon(&mut self, avatar_icon: Option<String>) {
-        self.avatar_icon = avatar_icon;
+    pub fn set_avatar_icon(&mut self, config: &AppConfig, file: Option<AppFile>) {
+        self.avatar_id = match file.clone() {
+            Some(file) => Some(file.id),
+            None => None
+        };
+
+        
+        self.avatar_url = match file {
+            Some(file) => Some(file.get_url(config)),
+            None => None
+        };
     }
 }
 
@@ -88,7 +101,8 @@ impl Into<PublicUser> for User {
         return PublicUser {
             id: self.id,
             username: self.username,
-            avatar_icon: self.avatar_icon,
+            avatar_id: self.avatar_id,
+            avatar_url: self.avatar_url,
             questions_count: self.questions_count,
             answers_count: self.answers_count,
             thanks_count: self.thanks_count,

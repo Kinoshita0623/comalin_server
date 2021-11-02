@@ -96,7 +96,8 @@ table! {
     users (id) {
         id -> Uuid,
         username -> Varchar,
-        avatar_icon -> Nullable<Varchar>,
+        avatar_id -> Nullable<Uuid>,
+        avatar_url -> Nullable<Varchar>,
         questions_count -> Int4,
         answers_count -> Int4,
         thanks_count -> Int4,
@@ -111,6 +112,7 @@ joinable!(question_files -> questions (question_id));
 joinable!(questions -> addresses (address_id));
 joinable!(questions -> users (user_id));
 joinable!(user_tokens -> users (user_id));
+joinable!(users -> files (avatar_id));
 
 allow_tables_to_appear_in_same_query!(
     addresses,

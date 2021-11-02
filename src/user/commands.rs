@@ -15,7 +15,8 @@ pub struct NewUser {
 
     #[validate(custom(function="is_unique_username", arg="&'v_a UserRepository"))]
     pub username: String,
-    pub avatar_icon: Option<String>,
+    pub avatar_id: Option<Uuid>,
+    pub avatar_url: Option<String>,
     pub encrypted_password: String
 }
 
@@ -29,7 +30,8 @@ pub fn is_unique_username(value: &str, arg: &dyn UserRepository) -> Result<(), V
 
 pub struct NewUserAttr {
     pub username: String,
-    pub avatar_icon: Option<String>,
+    pub avatar_id: Option<Uuid>,
+    pub avatar_url: Option<String>,
     pub password: String
 }
 
@@ -39,10 +41,8 @@ impl NewUser {
         let user = NewUser {
             id: Uuid::new_v4(),
             username: new_user.username.to_string(),
-            avatar_icon: match new_user.avatar_icon {
-                Some(t) => Some(t.to_string()),
-                None => None
-            },
+            avatar_id: new_user.avatar_id,
+            avatar_url: new_user.avatar_url,
             encrypted_password: bcrypt::hash(new_user.password, DEFAULT_COST)?
         };
         return Ok(user);

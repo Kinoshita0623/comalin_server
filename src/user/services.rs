@@ -120,7 +120,8 @@ impl UserService for PgUserService {
         let new_user = NewUser::new(NewUserAttr {
             username: req.username.clone().unwrap(),
             password: req.password.clone().unwrap(),
-            avatar_icon: None
+            avatar_id: None,
+            avatar_url: None
         });
         let new_user = match new_user {
             Ok(u) => u,

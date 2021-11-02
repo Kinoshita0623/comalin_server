@@ -39,7 +39,8 @@ impl AppModule {
         return Box::new(
             QuestionModuleImpl {
                 pool: self.pool.clone(),
-                user_module: self.user_module()
+                user_module: self.user_module(),
+                config: self.config.clone()
             }
         )
     }
